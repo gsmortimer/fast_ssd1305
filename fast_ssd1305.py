@@ -475,6 +475,7 @@ class fast_ssd1305Base(object):
         self.command(v_amount % 64)
         self.scroll_on()
 
+    ### Fancy Text scrolling routine
     def text_scroll(self,text,size):
         if (size == 8):
             font = ImageFont.truetype('pressstart2p.ttf',8)
@@ -507,6 +508,26 @@ class fast_ssd1305Base(object):
                     self.scroll_down(1)
                     time.sleep(.05)
             c += 1
+
+    ### Just draw some text
+    def text (self,text,size,line):
+        if (size == 8):
+            font = ImageFont.truetype('pressstart2p.ttf',8)
+            scroll = 1
+        elif (size == 16):
+            font = ImageFont.truetype('perfect_dos_vga_437.ttf',16)
+            scroll = 2
+        else:
+            raise ValueError('Font size must be 8 or 16')
+        if line < 0 or line > 7:
+            raise ValueError('Text Line must be a value from 0 to 7 (inclusive).')
+        self._pagedraw.rectangle((0,0,self.width,8),outline=0,fill=0)
+        self._pagedraw.text((0,0), text, font=font,fill=255)
+        self.page(self._pageimage,line % 8)
+        if (size == 16 and line < 6) :
+            self._pagedraw.rectangle((0,0,self.width,8),outline=0,fill=0)
+            self._pagedraw.text((0,-8), text, font=font,fill=255)
+            self.page(self._pageimage,(line + 1) % 8)
 
 ### Configuration for Waveshare 128 x 32 pixel display
 class SSD1305_128_32(fast_ssd1305Base):
